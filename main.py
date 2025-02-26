@@ -8,7 +8,8 @@ class Size(Enum):
     XLARGE = 'xlarge'
 
 class Topping:
-    def __init__(self, name, price):
+    def __init__(self, id, name, price):
+        self._id = id
         self._name = name
         self._price = price
 
@@ -17,6 +18,9 @@ class Topping:
     
     def get_name(self):
         return self._name
+    
+    def get_id(self):
+        return self._id
     
 class PizzaSize:
     def __init__(self, name, price):
@@ -55,20 +59,24 @@ class Menu:
         return self._pizzaSize.values()
     
 class Pizza:
-    def __init__(self, size):
+    def __init__(self, id, size):
+        self._id = id
         self._size = size
         self._toppings = {}
 
-    def add_topping(self, topping):
-        if topping.get_name() not in self._toppings:
-            self.toppings[topping.get_name()] = topping
+    def get_id(self):
+        return self._id
     
-    def remove_topping(self, topping):
-        if topping.get_name() in self._toppings:
-            del self.toppings[topping.get_name()]
+    def add_topping(self, topping):
+        if topping.get_id() not in self._toppings:
+            self.toppings[topping.get_id()] = topping
+    
+    def remove_topping(self, id):
+        if id in self._toppings:
+            del self.toppings[id]
 
     def calculate_cost(self):
-        total = 0
+        total = self._size.get_price()
         for topping in self._toppings.values():
             total += topping.get_price()
 
@@ -76,13 +84,20 @@ class Pizza:
     
 class Order:
     def __init__(self):
-        self._orders = []
+        self._orders = {}
 
     def add_pizza(self, pizza):
-        self._orders.append(pizza)
+        if pizza.get_id() not in self.orders:
+            self._orders[pizza.get_id()] = pizza
 
-    def remove_pizza(self, i):
-        del self._orders[i]
+    def remove_pizza(self, id):
+        del self._orders[id]
+
+    def add_topping(self, pizza_id, topping):
+        self._orders[pizza_id].add_topping(topping)
+
+    def remove_topping(self, pizza_id, topping_id):
+        self._orders[pizza_id].remove_topping(topping_id)
 
     def calculate_total(self):
         total = 0
@@ -91,4 +106,4 @@ class Order:
 
         return total
     
-    
+
